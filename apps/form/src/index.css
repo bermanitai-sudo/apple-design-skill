@@ -1,0 +1,233 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink: #080808;
+  --white: #ffffff;
+  --lime: #b7ff35;
+  --lime-ink: #0b1400;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --mute: rgba(255, 255, 255, 0.56);
+  --faint: rgba(255, 255, 255, 0.36);
+  --surface: rgba(255, 255, 255, 0.045);
+  --surface-hi: rgba(255, 255, 255, 0.07);
+  --glass: rgba(26, 26, 26, 0.62);
+  --shadow-card: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 1px 2px rgba(0, 0, 0, 0.55), 0 18px 40px -12px rgba(0, 0, 0, 0.85);
+  --shadow-glass: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 0 0 1px rgba(255, 255, 255, 0.06), 0 10px 30px rgba(0, 0, 0, 0.55),
+    0 2px 6px rgba(0, 0, 0, 0.4);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  color-scheme: dark;
+}
+
+html.oled {
+  --ink: #000000;
+}
+
+html,
+body {
+  background: var(--ink);
+  color: var(--white);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+body {
+  font-family: theme('fontFamily.sans');
+  font-feature-settings: 'ss01', 'cv11';
+  min-height: 100dvh;
+}
+
+/* Brand light lives in the content layer so the glass above has something to refract. */
+.ambient {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.ambient::before,
+.ambient::after {
+  content: '';
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+}
+.ambient::before {
+  width: 360px;
+  height: 360px;
+  right: -140px;
+  top: -120px;
+  background: var(--lime);
+  opacity: 0.09;
+}
+.ambient::after {
+  width: 320px;
+  height: 320px;
+  left: -160px;
+  top: 38%;
+  background: var(--white);
+  opacity: 0.035;
+}
+
+@layer components {
+  /* Content layer: a standard material with depth, never the functional glass. */
+  .surface {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--shadow-card);
+    -webkit-backdrop-filter: blur(20px) saturate(1.3);
+    backdrop-filter: blur(20px) saturate(1.3);
+  }
+  .surface-flat {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+  }
+  /* Functional layer: tab bar, sheets, floating controls. */
+  .glass {
+    background: var(--glass);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: var(--shadow-glass);
+    -webkit-backdrop-filter: blur(28px) saturate(1.5);
+    backdrop-filter: blur(28px) saturate(1.5);
+  }
+  .media {
+    border-radius: 14px;
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 12px 28px -10px rgba(0, 0, 0, 0.9);
+    overflow: hidden;
+  }
+  .eyebrow {
+    font-size: 11px;
+    line-height: 14px;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+  .num {
+    font-family: theme('fontFamily.display');
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.035em;
+  }
+  .hairline {
+    border-color: var(--line);
+  }
+  .field {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 16px;
+    color: var(--white);
+    outline: none;
+    transition:
+      border-color 0.15s,
+      background 0.15s;
+  }
+  .field:focus {
+    border-color: rgba(183, 255, 53, 0.6);
+    background: rgba(255, 255, 255, 0.07);
+  }
+  .field::placeholder {
+    color: var(--faint);
+  }
+  .tap {
+    transition:
+      transform 0.12s ease,
+      opacity 0.12s ease;
+  }
+  .tap:active {
+    transform: scale(0.97);
+    opacity: 0.85;
+  }
+}
+
+/* Scroll edge effect under the floating header. */
+.edge-top {
+  -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent);
+  mask-image: linear-gradient(to bottom, black 55%, transparent);
+}
+
+input[type='time'],
+input[type='date'],
+input[type='datetime-local'] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 46px;
+}
+input[type='time']::-webkit-calendar-picker-indicator,
+input[type='date']::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.6;
+}
+select.field {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.leaflet-container {
+  background: #0d0d0d !important;
+  font-family: inherit;
+}
+.leaflet-control-attribution {
+  background: rgba(8, 8, 8, 0.6) !important;
+  color: var(--faint) !important;
+  font-size: 9px !important;
+}
+.leaflet-control-attribution a {
+  color: var(--mute) !important;
+}
+
+/* Reduce transparency (system or in-app): opaque fallbacks. */
+html.solid .glass,
+html.solid .surface {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+html.solid .glass {
+  background: #1a1a1a;
+}
+html.solid .surface {
+  background: #121212;
+}
+html.solid .ambient {
+  display: none;
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .surface {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .glass {
+    background: #1a1a1a;
+  }
+  .surface {
+    background: #121212;
+  }
+  .ambient {
+    display: none;
+  }
+}
+@media (prefers-contrast: more) {
+  :root {
+    --line: rgba(255, 255, 255, 0.24);
+    --mute: rgba(255, 255, 255, 0.78);
+    --faint: rgba(255, 255, 255, 0.6);
+  }
+}
